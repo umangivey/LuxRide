@@ -120,6 +120,14 @@ export class Mode3D {
     const slot: Slot = { def, avatar, home: new THREE.Vector3(), vel: new THREE.Vector3(), vy: 0 };
     avatar.onEvent = (name) => this.onAvatarEvent(slot, name);
     this.slots.push(slot);
+    // Keep roster order (Hana, Ren, ...) no matter which file finished loading first.
+    const rank = (s: Slot) => {
+      const i = ROSTER_3D.findIndex((d) => d.id === s.def.id);
+      return i < 0 ? 99 : i;
+    };
+    const cur = this.slots[this.selected];
+    this.slots.sort((a, b) => rank(a) - rank(b));
+    if (cur) this.selected = this.slots.indexOf(cur);
     this.scene.add(avatar.root);
     this.layout();
     this.refreshCards();
@@ -144,9 +152,7 @@ export class Mode3D {
     const s = this.slots[i];
     if (!s) return;
     this.ui.moods.set(s.avatar.mood);
-    if (!this.play) {
-      this.controls.target.set(s.avatar.root.position.x * 0.6, 1.0, 0);
-    }
+    if (!this.play) this.controls.target.set(0, 1.0, 0);
   }
 
   private get current(): Slot | undefined {
@@ -379,6 +385,10 @@ export class Mode3D {
     const hgt = this.stage.clientHeight || window.innerHeight;
     this.renderer.setSize(w, hgt);
     this.camera.aspect = w / hgt;
+    // Frame the scene in the area left of the floating menu card on wide screens.
+    const panelOpen = !document.body.classList.contains('panel-closed') && w > 760;
+    if (panelOpen) this.camera.setViewOffset(w, hgt, 186, 0, w, hgt);
+    else this.camera.clearViewOffset();
     this.camera.updateProjectionMatrix();
   }
 
@@ -478,8 +488,8 @@ export class Mode3D {
     }
     toast(`Loading ${def.name}…`);
     try {
-      await this.addAvatar(def);
-      this.select(this.slots.length - 1);
+      const slot = await this.addAvatar(def);
+      this.select(this.slots.indexOf(slot));
       toast(`${def.name} joined the plaza.`);
     } catch (e) {
       toast(`Could not load ${def.name}: ${(e as Error).message}`);
@@ -499,8 +509,8 @@ export class Mode3D {
           this.slots.splice(idx, 1);
         }
       }
-      await this.addAvatar(def, undefined, data);
-      this.select(this.slots.length - 1);
+      const slot = await this.addAvatar(def, undefined, data);
+      this.select(this.slots.indexOf(slot));
       toast(`${name} joined the plaza.`);
     } catch (e) {
       toast(`That file did not load as a VRM avatar. ${(e as Error).message}`);

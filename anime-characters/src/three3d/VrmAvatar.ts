@@ -38,7 +38,38 @@ const SEGMENTS: Record<(typeof FINGERS)[number], string[]> = {
 const loader = new GLTFLoader();
 loader.register((parser) => new VRMLoaderPlugin(parser));
 
+/**
+ * The hosted single-page build cannot serve .vrm files, so scripts/build_artifact.py
+ * stores each model as base64 inside "<name>.vrm.json"; this reads that back.
+ */
+async function fetchEmbedded(url: string, onProgress?: (p: number) => void): Promise<ArrayBuffer> {
+  const res = await fetch(`${url}.json`);
+  if (!res.ok) throw new Error(`Model not found (${res.status})`);
+  const total = Number(res.headers.get('content-length')) || 0;
+  let text = '';
+  if (res.body && total) {
+    const reader = res.body.getReader();
+    const dec = new TextDecoder();
+    let got = 0;
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      got += value.length;
+      text += dec.decode(value, { stream: true });
+      onProgress?.(got / total);
+    }
+    text += dec.decode();
+  } else {
+    text = await res.text();
+  }
+  const bin = atob((JSON.parse(text) as { base64: string }).base64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return bytes.buffer;
+}
+
 export async function loadVrm(src: string | ArrayBuffer, onProgress?: (p: number) => void): Promise<VRM> {
+  if (typeof src === 'string' && import.meta.env.MODE === 'artifact') src = await fetchEmbedded(src, onProgress);
   const gltf =
     typeof src === 'string'
       ? await loader.loadAsync(src, (e) => onProgress?.(e.total ? e.loaded / e.total : 0))

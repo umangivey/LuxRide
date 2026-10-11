@@ -27,9 +27,10 @@ if (args[0] === '--plan') {
   plan = [shot];
 }
 
-const server = await createServer({ server: { port: 5199, host: '127.0.0.1' }, logLevel: 'error' });
-await server.listen();
-const base = 'http://127.0.0.1:5199';
+// SHOOT_BASE points at an already running static server (e.g. for the built artifact).
+const server = process.env.SHOOT_BASE ? null : await createServer({ server: { port: 5199, host: '127.0.0.1' }, logLevel: 'error' });
+await server?.listen();
+const base = process.env.SHOOT_BASE ?? 'http://127.0.0.1:5199';
 
 const executablePath = process.env.CHROME_PATH || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
 const browser = await chromium.launch({
@@ -62,5 +63,5 @@ for (const shot of plan) {
 }
 
 await browser.close();
-await server.close();
+await server?.close();
 process.exit(failures ? 1 : 0);
