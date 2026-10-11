@@ -1,0 +1,28 @@
+{
+  "name": "anime-characters",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Hana and Ren: procedural anime game characters in Three.js (3D + 2.5D live).",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "shoot": "node scripts/shoot.mjs",
+    "artifact": "vite build --mode artifact && python3 scripts/build_artifact.py"
+  },
+  "dependencies": {
+    "@hazart-pkg/live2d-core": "^1.0.1",
+    "@pixiv/three-vrm": "^3.4.2",
+    "pixi-live2d-display-lipsyncpatch": "^0.5.0-ls-8",
+    "pixi.js": "^7.4.2",
+    "three": "^0.180.0"
+  },
+  "devDependencies": {
+    "@types/three": "^0.180.0",
+    "playwright": "^1.56.1",
+    "typescript": "^5.8.3",
+    "vite": "^6.4.1"
+  }
+}

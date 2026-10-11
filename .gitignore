@@ -22,3 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# anime-characters build output
+anime-characters/dist-artifact
+anime-characters/shots
+
+# downloaded by scripts/fetch_models.py (third-party models)
+anime-characters/public/models

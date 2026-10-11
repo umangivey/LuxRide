@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hana &amp; Ren</title>
+<meta name="description" content="Anime game characters in Three.js: a playable 3D shrine plaza and 2.5D Live2D companions.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+</head>
+<body>
+<div class="app" id="app">
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">花</span>
+      <span class="brand-name">Hana &amp; Ren</span>
+    </div>
+    <nav class="modes" role="tablist" aria-label="Mode">
+      <button type="button" role="tab" id="tab-3d" data-mode="3d" aria-selected="true">3D World</button>
+      <button type="button" role="tab" id="tab-live" data-mode="live" aria-selected="false">2.5D Live</button>
+    </nav>
+    <button type="button" class="panel-toggle" id="panel-toggle" aria-expanded="true" aria-controls="panel">Menu</button>
+  </header>
+  <main class="stage" id="stage"></main>
+  <aside class="panel" id="panel" aria-label="Controls"></aside>
+  <div class="hud" id="hud"></div>
+  <div class="loading" id="loading" hidden>
+    <p>Loading</p>
+    <div class="bar"><i></i></div>
+  </div>
+</div>
+<script type="module" src="/src/main.ts"></script>
+</body>
+</html>
